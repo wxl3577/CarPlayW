@@ -1,0 +1,66 @@
+name: CarPlayW
+options:
+  bundleIdPrefix: dev.carplaycanvas
+  projectFormat: xcode15_0
+  deploymentTarget:
+    iOS: "15.0"
+  xcodeVersion: "15.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.7"
+    IPHONEOS_DEPLOYMENT_TARGET: "15.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    SUPPORTS_MACCATALYST: NO
+    ENABLE_BITCODE: NO
+targets:
+  CarPlayW:
+    type: application
+    platform: iOS
+    sources:
+      - path: CarPlayW
+        excludes:
+          - Resources/Info.plist
+          - Resources/CarPlayW.entitlements
+      - path: ThirdParty/astcenc
+        excludes:
+          - README.md
+        compilerFlags: "-O2 -ffp-contract=off"
+    dependencies:
+      - sdk: libc++.tbd
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.carplaycanvas.app
+        PRODUCT_NAME: CarPlayW
+        INFOPLIST_FILE: CarPlayW/Resources/Info.plist
+        CODE_SIGN_ENTITLEMENTS: CarPlayW/Resources/CarPlayW.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "16"
+        CLANG_CXX_LANGUAGE_STANDARD: c++14
+        SWIFT_OBJC_BRIDGING_HEADER: CarPlayW/CarPlayW-Bridging-Header.h
+    scheme:
+      testTargets:
+        - CarPlayWTests
+        - CarPlayWUITests
+  CarPlayWTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: CarPlayW
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.carplaycanvas.tests
+        GENERATE_INFOPLIST_FILE: YES
+  CarPlayWUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    dependencies:
+      - target: CarPlayW
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.carplaycanvas.uitests
+        GENERATE_INFOPLIST_FILE: YES

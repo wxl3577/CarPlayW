@@ -1,0 +1,55 @@
+name: Build CarPlayW IPA
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Run unit tests
+        run: >-
+          xcodebuild test
+          -project CarPlayW.xcodeproj
+          -scheme CarPlayW
+          -sdk iphonesimulator
+          -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest'
+          CODE_SIGNING_ALLOWED=NO
+
+      - name: Collect UI screenshots
+        if: always()
+        run: |
+          mkdir -p build/ui-screenshots
+          find "$HOME/Library/Developer/CoreSimulator/Devices" -type f -name 'CarPlayW-UI-*.png' -exec cp {} build/ui-screenshots/ \;
+
+      - name: Upload UI screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CarPlayW-UI
+          path: build/ui-screenshots/*.png
+          if-no-files-found: warn
+
+      - name: Build unsigned TrollStore IPA
+        run: chmod +x scripts/build-ipa.sh && ./scripts/build-ipa.sh
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CarPlayW-IPA
+          path: build/CarPlayW.ipa
+          if-no-files-found: error

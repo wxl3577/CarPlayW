@@ -1,0 +1,10 @@
+.DS_Store
+DerivedData/
+build/
+Payload/
+*.ipa
+*.xcuserstate
+xcuserdata/
+.build/
+work/
+outputs/
