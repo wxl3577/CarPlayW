@@ -4,8 +4,6 @@
 
 Customize CarPlay wallpapers with TrollStore. One image for both light and dark appearances.
 
-作者 / Author：鱼头 · 版本 / Version：1.0
-
 [下载 / Download v1.0](https://github.com/wxl3577/CarPlayW/releases/tag/v1.0)
 
 ## 已测试设备 / Tested device
