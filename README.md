@@ -10,16 +10,18 @@ Customize CarPlay wallpapers with TrollStore. One image for both light and dark 
 
 iPhone 12（MGGM3CH/A）· iOS 15.6（19G71）· TrollStore
 
-不保证其他机型、系统或车机可用。Other devices, iOS versions and head units are not guaranteed to work.
+其它机型与系统请自行测试。Please test other devices and iOS versions yourself.
 
 ## 使用方式
 
 用 TrollStore 安装 Releases 中的 IPA，然后：
 
-1. 连接 CarPlay，在车机「设置 → 壁纸」选择系统壁纸，生成缓存。
+1. 连接 CarPlay，在车机「设置 → 壁纸」选择系统壁纸，点击「设置」生成缓存。
 2. 断开 CarPlay，打开本应用，点击右上角刷新。
-3. 选择系列，在「缓存」TAB 查看亮/暗原图及尺寸；建议准备同尺寸图片（例如原图为 2048 × 2048），选择后点击「同时写入亮暗壁纸」。默认完整留边，不裁切。
+3. 选择系列，在「缓存」TAB 查看亮/暗原图及尺寸；选择一张与缓存相同尺寸的图片，点击「同时写入亮暗壁纸」。默认完整留边，不裁切。
 4. 写入成功后可查看缓存确认效果，推荐重启手机，再重新连接 CarPlay。
+
+当前测试设备的图片示例：**2048 × 2048 像素，140 DPI**。请以自己的缓存原图尺寸为准；140 DPI 仅为示例，不是写入限制。
 
 请停车后操作。所选系列至少需要已有一份亮或暗缓存，缺失的一份会自动补齐。刷新仅读取手机已有缓存。
 
@@ -33,10 +35,12 @@ iPhone 12（MGGM3CH/A）· iOS 15.6（19G71）· TrollStore
 
 Install the IPA from Releases with TrollStore, then:
 
-1. Connect CarPlay. Choose a system wallpaper in the head unit's **Settings → Wallpaper** to generate the cache.
+1. Connect CarPlay. Choose a system wallpaper in the head unit's **Settings → Wallpaper**, then tap **Set** to generate the cache.
 2. Disconnect CarPlay. Open this app and tap the refresh button at the top right.
-3. Choose a family and open **缓存** (Cache) to inspect available light/dark images and their dimensions. Use an image matching the original size (e.g. 2048 × 2048), then tap **同时写入亮暗壁纸** (Apply to both appearances). Images are fitted with black padding, never cropped.
+3. Choose a family and open **缓存** (Cache) to inspect available light/dark images and their dimensions. Select a photo with the same pixel dimensions as the cache, then tap **同时写入亮暗壁纸** (Apply to both appearances). Images are fitted with black padding, never cropped.
 4. Inspect the saved cache, then restart the phone as recommended and reconnect CarPlay.
+
+Image example from the tested device: **2048 × 2048 pixels, 140 DPI**. Match your own cache's pixel dimensions; 140 DPI is an example, not a writing requirement.
 
 Operate only while parked. At least one cached appearance must exist for the selected family; the missing counterpart is created automatically. Refresh reads existing files on the phone.
 

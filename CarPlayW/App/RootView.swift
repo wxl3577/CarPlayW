@@ -195,6 +195,10 @@ struct RootView: View {
                     .padding(.vertical, 5)
                 }
             }
+            Text(t(UsageGuide.imageExample))
+                .font(.footnote).foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("imageSizeExample")
             Text(t("请停车后操作。刷新仅读取手机已有缓存。"))
                 .font(.footnote).foregroundColor(.secondary)
             Text(t("重启或切换系统壁纸可能重建缓存；如效果消失，请刷新检查。"))
@@ -232,7 +236,7 @@ struct RootView: View {
                     HStack { Label(t("项目主页"), systemImage: "link"); Spacer(); Image(systemName: "arrow.up.right") }
                 }
             }
-            Text(t("已测试 iPhone 12 · iOS 15.6\n其他机型与系统不保证可用。"))
+            Text(t(UsageGuide.testedDeviceMessage))
                 .font(.footnote).foregroundColor(.secondary).multilineTextAlignment(.center)
             Spacer(minLength: 0)
         }

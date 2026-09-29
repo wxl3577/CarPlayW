@@ -24,10 +24,17 @@ final class NavigationTests: XCTestCase {
                 XCTAssertTrue(app.buttons["清除全部缓存图像"].exists)
             case "说明":
                 XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "推荐重启手机")).firstMatch.exists)
+                XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "点击「设置」")).firstMatch.exists)
+                XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "与缓存相同尺寸")).firstMatch.exists)
+                let example = app.staticTexts["imageSizeExample"]
+                XCTAssertTrue(example.exists)
+                XCTAssertTrue(example.label.contains("140 DPI"))
+                XCTAssertLessThan(example.frame.maxY, app.tabBars.firstMatch.frame.minY)
             default:
                 XCTAssertTrue(app.staticTexts["CarPlayW"].exists)
                 XCTAssertTrue(app.staticTexts["鱼头"].exists)
                 XCTAssertTrue(app.staticTexts["v1.0"].exists)
+                XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "其它机型与系统请自行测试")).firstMatch.exists)
                 XCTAssertTrue(app.buttons["项目主页"].exists || app.links["项目主页"].exists)
             }
             let screenshot = app.screenshot()
@@ -57,6 +64,17 @@ final class NavigationTests: XCTestCase {
         for (index, title) in ["Wallpaper", "Cache", "Guide", "About"].enumerated() {
             app.tabBars.buttons[title].tap()
             XCTAssertEqual(app.scrollViews.count, 0)
+            if title == "Guide" {
+                XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "tap Set")).firstMatch.exists)
+                XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "matching the cache dimensions")).firstMatch.exists)
+                let example = app.staticTexts["imageSizeExample"]
+                XCTAssertTrue(example.exists)
+                XCTAssertTrue(example.label.contains("2048 × 2048 pixels, 140 DPI"))
+                XCTAssertLessThan(example.frame.maxY, app.tabBars.firstMatch.frame.minY)
+            }
+            if title == "About" {
+                XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Please test other devices")).firstMatch.exists)
+            }
             let screenshot = app.screenshot()
             try screenshot.pngRepresentation.write(to: FileManager.default.temporaryDirectory.appendingPathComponent("CarPlayW-UI-en-\(index).png"))
         }
