@@ -18,7 +18,9 @@ final class WallpaperImageCacheTests: XCTestCase {
     }
 
     private func original() throws -> Data {
-        try XCTUnwrap(UIGraphicsImageRenderer(size: CGSize(width: 16, height: 16)).image { context in
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        return try XCTUnwrap(UIGraphicsImageRenderer(size: CGSize(width: 16, height: 16), format: format).image { context in
             UIColor.blue.setFill()
             context.fill(CGRect(x: 0, y: 0, width: 16, height: 16))
         }.pngData())
