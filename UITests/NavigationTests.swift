@@ -4,12 +4,20 @@ final class NavigationTests: XCTestCase {
     private func captureSettledScreenshot(of app: XCUIApplication, named fileName: String) throws -> XCUIScreenshot {
         // SwiftUI tab and wallpaper transitions can outlive the accessibility update.
         // Let the final frame settle so uploaded previews never capture an in-flight animation.
-        Thread.sleep(forTimeInterval: 0.5)
+        Thread.sleep(forTimeInterval: 1.0)
         let screenshot = app.screenshot()
         try screenshot.pngRepresentation.write(
             to: FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
         )
         return screenshot
+    }
+
+    private func waitUntilHittable(_ element: XCUIElement, timeout: TimeInterval = 5) {
+        let expectation = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "hittable == true"),
+            object: element
+        )
+        XCTAssertEqual(XCTWaiter().wait(for: [expectation], timeout: timeout), .completed)
     }
 
     func testBuiltInPreviewSelectionAndWrite() throws {
@@ -34,12 +42,15 @@ final class NavigationTests: XCTestCase {
         XCTAssertEqual(app.staticTexts["builtInWallpaperName"].label, "海边童趣")
         app.buttons["关闭"].tap()
         XCTAssertFalse(app.staticTexts["selectedImageSource"].label.contains("雪山映湖"), "Preview cancellation must not change the selected image")
+        waitUntilHittable(app.buttons["chooseBuiltInWallpaper"])
         app.buttons["chooseBuiltInWallpaper"].tap()
         app.buttons["useBuiltInWallpaper"].tap()
         XCTAssertTrue(app.staticTexts["selectedImageSource"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["selectedImageSource"].label.contains("雪山映湖"))
         for (offset, title) in ["海边童趣", "暮色灯塔", "晴空小鸟", "棕影晚霞"].enumerated() {
+            waitUntilHittable(app.buttons["chooseBuiltInWallpaper"])
             app.buttons["chooseBuiltInWallpaper"].tap()
+            waitUntilHittable(app.buttons["关闭"])
             for _ in 0...offset { app.buttons["nextBuiltInWallpaper"].tap() }
             XCTAssertEqual(app.staticTexts["builtInWallpaperName"].label, title)
             XCTAssertEqual(app.staticTexts["builtInWallpaperPosition"].label, "\(offset + 2) / 5")
@@ -70,9 +81,11 @@ final class NavigationTests: XCTestCase {
         app.tabBars.buttons.element(boundBy: 3).tap()
         app.segmentedControls["languageSelector"].buttons["简体中文"].tap()
         XCTAssertTrue(app.tabBars.buttons["壁纸"].waitForExistence(timeout: 15))
+        let navigationTitles = ["壁纸": "CarPlayW", "缓存": "缓存图像", "说明": "使用说明", "关于": "关于"]
         for (index, title) in ["壁纸", "缓存", "说明", "关于"].enumerated() {
             app.tabBars.buttons[title].tap()
             XCTAssertTrue(app.tabBars.buttons[title].isSelected)
+            XCTAssertTrue(app.navigationBars[navigationTitles[title] ?? title].waitForExistence(timeout: 5))
             XCTAssertEqual(app.scrollViews.count, 0, "Pages must not require vertical scrolling")
             switch title {
             case "壁纸":
@@ -122,8 +135,10 @@ final class NavigationTests: XCTestCase {
         app.buttons["familySelector"].tap()
         app.buttons["RedDynamic"].firstMatch.tap()
         XCTAssertTrue(app.staticTexts["RedDynamic"].waitForExistence(timeout: 10))
+        let navigationTitles = ["Wallpaper": "CarPlayW", "Cache": "Cached images", "Guide": "Quick guide", "About": "About"]
         for (index, title) in ["Wallpaper", "Cache", "Guide", "About"].enumerated() {
             app.tabBars.buttons[title].tap()
+            XCTAssertTrue(app.navigationBars[navigationTitles[title] ?? title].waitForExistence(timeout: 5))
             XCTAssertEqual(app.scrollViews.count, 0)
             if title == "Guide" {
                 XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "tap Set")).firstMatch.exists)
