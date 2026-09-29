@@ -54,6 +54,13 @@ Use the blue **Select / change family** button. Images use square 1:1 display ar
 
 To clear caches: disconnect → **清除全部缓存图像** (Clear all cached images) → repeat steps 1–2. There is no backup or undo.
 
+## 软件截图 / App screenshots
+
+<p>
+  <img src="docs/app-wallpaper.png" alt="壁纸页面 / Wallpaper screen" width="320">
+  <img src="docs/app-guide.png" alt="使用说明 / Usage guide" width="320">
+</p>
+
 ## 实测效果 / On-device result
 
 ![iPhone 12 · iOS 15.6 · CarPlayW](docs/carplay-test-iphone12-ios15.6.jpg)
