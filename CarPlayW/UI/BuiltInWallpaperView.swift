@@ -11,7 +11,7 @@ struct BuiltInWallpaperView: View {
             VStack(spacing: 16) {
                 Text(language.text(BuiltInWallpaper.name)).font(.title2.bold())
                 if let pixels = image?.cgImage {
-                    Text("\(pixels.width) × \(pixels.height) \(language.text("像素"))")
+                    Text("\(String(pixels.width)) × \(String(pixels.height)) \(language.text("像素"))")
                         .font(.subheadline).foregroundColor(.secondary)
                 }
                 GeometryReader { geometry in

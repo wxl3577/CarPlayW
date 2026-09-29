@@ -4,6 +4,26 @@ import ImageIO
 @testable import CarPlayW
 
 final class CPBitmapCodecTests: XCTestCase {
+    func testLegacyNonUniformImageKeepsTopAndBottomRows() throws {
+        var original = Data(count: 128 * 128 * 4)
+        append([0, 128, 128, 1, 1, 0], to: &original)
+        let image = pattern()
+        let result = try CPBitmapCodec.encode(image: image, using: original, layout: .fit)
+        XCTAssertEqual(Array(result[0..<4]), [0, 255, 0, 255], "Top-left stays green in BGRA")
+        let bottomRight = (128 * 128 - 1) * 4
+        XCTAssertEqual(Array(result[bottomRight..<bottomRight + 4]), [0, 255, 255, 255], "Bottom-right stays yellow in BGRA")
+        try CPBitmapCodec.validate(result, against: image)
+    }
+
+    func testBuiltInWallpaperSurvivesATXEncodeAndReadBack() throws {
+        let original = try template()
+        let source = try XCTUnwrap(BuiltInWallpaper.load())
+        let expected = try CPBitmapCodec.expectedImage(image: source, template: original, layout: .fit)
+        let encoded = try CPBitmapCodec.encode(image: source, using: original, layout: .fit)
+        try CPBitmapCodec.validate(encoded, against: expected)
+        XCTAssertEqual(try CPBitmapCodec.decode(encoded).cgImage?.width, 128)
+    }
+
     func testParsesIOS15FooterAndAlignedStride() throws {
         var data = Data(count: 112 * 4 * 55 + 40)
         append([17, 101, 55, 1, 1, 0], to: &data)

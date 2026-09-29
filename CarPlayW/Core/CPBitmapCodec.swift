@@ -235,8 +235,8 @@ enum CPBitmapCodec {
                 return false
             }
 
-            context.translateBy(x: 0, y: CGFloat(metadata.height))
-            context.scaleBy(x: 1, y: -1)
+            // Both sides use CGImage row order. Applying a UIKit-style flip here
+            // reverses non-uniform images when the raw BGRA plane is decoded.
             context.interpolationQuality = .high
             context.draw(
                 cgImage,
