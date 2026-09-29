@@ -57,8 +57,9 @@ To clear caches: disconnect → **清除全部缓存图像** (Clear all cached i
 ## 软件截图 / App screenshots
 
 <p>
-  <img src="docs/app-wallpaper.png" alt="壁纸页面 / Wallpaper screen" width="320">
-  <img src="docs/app-guide.png" alt="使用说明 / Usage guide" width="320">
+  <img src="docs/app-wallpaper.png" alt="壁纸页面 / Wallpaper screen" width="250">
+  <img src="docs/app-guide.png" alt="使用说明 / Usage guide" width="250">
+  <img src="docs/app-about.png" alt="关于页面 / About screen" width="250">
 </p>
 
 ## 实测效果 / On-device result
