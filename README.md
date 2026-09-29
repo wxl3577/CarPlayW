@@ -4,7 +4,7 @@
 
 Customize CarPlay wallpapers with TrollStore. One image for both light and dark appearances.
 
-[下载 / Download v1.0](https://github.com/wxl3577/CarPlayW/releases/tag/v1.0)
+[下载 / Download v1.1](https://github.com/wxl3577/CarPlayW/releases/tag/v1.1)
 
 ## 已测试设备 / Tested device
 
@@ -18,12 +18,12 @@ iPhone 12（MGGM3CH/A）· iOS 15.6（19G71）· TrollStore
 
 1. 连接 CarPlay，在车机「设置 → 壁纸」选择系统壁纸，点击「设置」生成缓存。
 2. 断开 CarPlay，打开本应用，点击右上角刷新。
-3. 选择系列，在「缓存」TAB 查看亮/暗原图及尺寸；从「相册图片」选择一张与缓存相同尺寸的图片，或打开「内置壁纸」选用「雪山映湖」，再点击「同时写入亮暗壁纸」。默认完整留边，不裁切。
+3. 选择系列，在「缓存」TAB 查看亮/暗原图及尺寸；从「相册图片」选择一张与缓存相同尺寸的图片，或打开「内置壁纸」选择喜欢的背景，再点击「同时写入亮暗壁纸」。默认完整留边，不裁切。
 4. 写入成功后可查看缓存确认效果，推荐重启手机，再重新连接 CarPlay。
 
 当前测试设备的图片示例：**2048 × 2048 像素，140 DPI**。请以自己的缓存原图尺寸为准；140 DPI 仅为示例，不是写入限制。
 
-内置「雪山映湖」为 2048 × 2048 原图，随应用离线提供。预览并点击「使用这张壁纸」仅选中图片，不会立即写入；也可随时改选相册图片。
+1.1 新增「海边童趣」「暮色灯塔」「晴空小鸟」「棕影晚霞」四张背景，保留原有「雪山映湖」，共五张 2048 × 2048 原图，随应用离线提供。使用「上一张 / 下一张」切换，显示当前序号和图片尺寸。预览并点击「使用这张壁纸」仅选中图片，不会立即写入；也可随时改选相册图片。
 
 请停车后操作。所选系列至少需要已有一份亮或暗缓存，缺失的一份会自动补齐。刷新仅读取手机已有缓存。
 
@@ -39,12 +39,12 @@ Install the IPA from Releases with TrollStore, then:
 
 1. Connect CarPlay. Choose a system wallpaper in the head unit's **Settings → Wallpaper**, then tap **Set** to generate the cache.
 2. Disconnect CarPlay. Open this app and tap the refresh button at the top right.
-3. Choose a family and open **缓存** (Cache) to inspect available light/dark images and their dimensions. Use **Photos** to select a matching-size image, or open **Built-in** and select **Alpine Reflection**, then tap **Apply to light & dark**. Images are fitted with black padding, never cropped.
+3. Choose a family and open **缓存** (Cache) to inspect available light/dark images and their dimensions. Use **Photos** to select a matching-size image, or open **Built-in** and choose a background, then tap **Apply to light & dark**. Images are fitted with black padding, never cropped.
 4. Inspect the saved cache, then restart the phone as recommended and reconnect CarPlay.
 
 Image example from the tested device: **2048 × 2048 pixels, 140 DPI**. Match your own cache's pixel dimensions; 140 DPI is an example, not a writing requirement.
 
-The original **Alpine Reflection** image (2048 × 2048) is bundled for offline use. Preview it and tap **Use this wallpaper** to select it; this does not write files until you tap Apply. You can switch back to a photo at any time.
+Version 1.1 adds **Seaside Joy**, **Twilight Lighthouse**, **Blue Sky Bird** and **Palm Sunset**, keeping **Alpine Reflection** for a total of five original 2048 × 2048 images bundled for offline use. Switch with **Previous / Next**; the current position and image dimensions are shown. Preview it and tap **Use this wallpaper** to select it; this does not write files until you tap Apply. You can switch back to a photo at any time.
 
 Operate only while parked. At least one cached appearance must exist for the selected family; the missing counterpart is created automatically. Refresh reads existing files on the phone.
 
