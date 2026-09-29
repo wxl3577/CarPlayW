@@ -22,7 +22,7 @@ struct BuiltInWallpaperView: View {
                             .accessibilityElement(children: .ignore)
                             .accessibilityIdentifier("builtInSquarePreview")
                         if model.isLoading {
-                            ProgressView(language.text(model.wallpapers.isEmpty ? "正在加载壁纸列表…" : "正在下载原图…"))
+                            ProgressView(language.text(model.wallpapers.isEmpty ? "正在加载壁纸列表…" : "正在加载原图…"))
                                 .padding().background(.regularMaterial).cornerRadius(12)
                                 .accessibilityIdentifier("wallpaperLoading")
                         } else if let error = model.errorKey {
@@ -52,7 +52,7 @@ struct BuiltInWallpaperView: View {
                     .disabled(model.selectedIndex >= model.wallpapers.count - 1)
                     .accessibilityIdentifier("nextBuiltInWallpaper")
                 }.buttonStyle(.bordered)
-                Text(language.text("联网获取原图；选用后，返回壁纸页点击「同时写入亮暗壁纸」。"))
+                Text(language.text("原图下载后保留；选用后，返回壁纸页点击「同时写入亮暗壁纸」。"))
                     .font(.footnote).foregroundColor(.secondary).multilineTextAlignment(.center)
                 Button {
                     guard let image = model.image, let wallpaper = model.wallpaper, !model.isLoading else { return }

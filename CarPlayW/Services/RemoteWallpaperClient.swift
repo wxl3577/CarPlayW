@@ -11,31 +11,48 @@ struct RemoteWallpaperClient: WallpaperLoading {
     static let catalogURL = URL(string: "https://480.pp.ua/web_share/carplay/yc/wallpapers.json")!
     typealias Download = (URLRequest) async throws -> (URL, URLResponse)
     private let download: Download
+    private let cache: WallpaperImageCache
     let catalogURL: URL
 
-    init(session: URLSession = .shared, catalogURL: URL = Self.catalogURL) {
+    init(session: URLSession = .shared, catalogURL: URL = Self.catalogURL, cache: WallpaperImageCache = .shared) {
         self.download = { try await session.download(for: $0) }
         self.catalogURL = catalogURL
+        self.cache = cache
     }
 
-    init(catalogURL: URL = Self.catalogURL, download: @escaping Download) {
+    init(catalogURL: URL = Self.catalogURL, cache: WallpaperImageCache = .shared, download: @escaping Download) {
         self.catalogURL = catalogURL
+        self.cache = cache
         self.download = download
     }
 
     func catalog() async throws -> [BuiltInWallpaper] {
         let data = try await fetch(catalogURL, limit: 1_048_576)
+        let wallpapers: [BuiltInWallpaper]
         do {
-            return try JSONDecoder().decode(WallpaperCatalog.self, from: data).resolved(relativeTo: catalogURL)
+            wallpapers = try JSONDecoder().decode(WallpaperCatalog.self, from: data).resolved(relativeTo: catalogURL)
         } catch {
             throw RemoteWallpaperError.invalidCatalog
         }
+        try await cache.reconcile(wallpapers)
+        return wallpapers
     }
 
     func image(for wallpaper: BuiltInWallpaper) async throws -> UIImage {
+        try Task.checkCancellation()
+        if let data = await cache.read(wallpaper) {
+            if let image = try? Self.decodeImage(data) {
+                try Task.checkCancellation()
+                return image
+            }
+            await cache.remove(wallpaper)
+        }
+        let ticket = await cache.ticket()
         let data = try await fetch(wallpaper.url, limit: 32 * 1_048_576)
         try Task.checkCancellation()
-        return try Self.decodeImage(data)
+        let image = try Self.decodeImage(data)
+        try await cache.save(data, for: wallpaper, ticket: ticket)
+        return image
     }
 
     static func decodeImage(_ data: Data) throws -> UIImage {
@@ -53,7 +70,7 @@ struct RemoteWallpaperClient: WallpaperLoading {
     }
 
     private func fetch(_ url: URL, limit: Int) async throws -> Data {
-        // Fetch fresh on every open/retry so remote edits take effect.
+        // The catalog is always fresh; images reach the network only on a disk-cache miss.
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 45)
         request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
         let (file, response) = try await download(request)

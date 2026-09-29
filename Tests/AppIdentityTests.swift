@@ -5,7 +5,7 @@ final class AppIdentityTests: XCTestCase {
     func testPublishedAppIdentity() {
         XCTAssertEqual(Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String, "CarPlayW")
         XCTAssertEqual(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String, "1.2")
-        XCTAssertEqual(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String, "20")
+        XCTAssertEqual(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String, "21")
         XCTAssertEqual(Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String, "CarPlayW")
         XCTAssertEqual(Bundle.main.object(forInfoDictionaryKey: "CFBundleExecutable") as? String, "CarPlayW")
         // Keep the original bundle ID so TrollStore can replace existing installations.

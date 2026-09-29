@@ -53,7 +53,7 @@ final class BuiltInWallpaperTests: XCTestCase {
     }
 
     private func client(data: Data, status: Int = 200, file: URL) -> RemoteWallpaperClient {
-        RemoteWallpaperClient { request in
+        RemoteWallpaperClient(cache: WallpaperImageCache(directory: file.appendingPathExtension("cache"))) { request in
             XCTAssertEqual(request.cachePolicy, .reloadIgnoringLocalCacheData)
             XCTAssertEqual(request.value(forHTTPHeaderField: "Cache-Control"), "no-cache")
             try data.write(to: file)
