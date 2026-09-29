@@ -15,21 +15,41 @@ final class NavigationTests: XCTestCase {
         XCTAssertTrue(app.staticTexts["雪山映湖"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["2048 × 2048 像素"].exists)
         XCTAssertTrue(app.buttons["useBuiltInWallpaper"].isEnabled)
+        XCTAssertEqual(app.staticTexts["builtInWallpaperPosition"].label, "1 / 5")
+        XCTAssertFalse(app.buttons["previousBuiltInWallpaper"].isEnabled)
         XCTAssertEqual(app.scrollViews.count, 0)
         try app.screenshot().pngRepresentation.write(to: FileManager.default.temporaryDirectory.appendingPathComponent("CarPlayW-UI-built-in.png"))
+        app.buttons["nextBuiltInWallpaper"].tap()
+        XCTAssertEqual(app.staticTexts["builtInWallpaperName"].label, "海边童趣")
         app.buttons["关闭"].tap()
         XCTAssertFalse(app.staticTexts["selectedImageSource"].label.contains("雪山映湖"), "Preview cancellation must not change the selected image")
         app.buttons["chooseBuiltInWallpaper"].tap()
         app.buttons["useBuiltInWallpaper"].tap()
         XCTAssertTrue(app.staticTexts["selectedImageSource"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["selectedImageSource"].label.contains("雪山映湖"))
+        for (offset, title) in ["海边童趣", "暮色灯塔", "晴空小鸟", "棕影晚霞"].enumerated() {
+            app.buttons["chooseBuiltInWallpaper"].tap()
+            for _ in 0...offset { app.buttons["nextBuiltInWallpaper"].tap() }
+            XCTAssertEqual(app.staticTexts["builtInWallpaperName"].label, title)
+            XCTAssertEqual(app.staticTexts["builtInWallpaperPosition"].label, "\(offset + 2) / 5")
+            XCTAssertTrue(app.staticTexts["2048 × 2048 像素"].exists)
+            if offset == 3 {
+                XCTAssertFalse(app.buttons["nextBuiltInWallpaper"].isEnabled)
+                app.buttons["previousBuiltInWallpaper"].tap()
+                XCTAssertEqual(app.staticTexts["builtInWallpaperName"].label, "晴空小鸟")
+                app.buttons["nextBuiltInWallpaper"].tap()
+            }
+            try app.screenshot().pngRepresentation.write(to: FileManager.default.temporaryDirectory.appendingPathComponent("CarPlayW-UI-built-in-\(offset + 1).png"))
+            app.buttons["useBuiltInWallpaper"].tap()
+            XCTAssertTrue(app.staticTexts["selectedImageSource"].label.contains(title))
+        }
         XCTAssertEqual(app.scrollViews.count, 0)
         XCTAssertLessThanOrEqual(app.buttons["同时写入亮暗壁纸"].frame.maxY, app.tabBars.firstMatch.frame.minY)
         try app.screenshot().pngRepresentation.write(to: FileManager.default.temporaryDirectory.appendingPathComponent("CarPlayW-UI-built-in-selected.png"))
         app.buttons["同时写入亮暗壁纸"].tap()
         XCTAssertTrue(app.alerts["亮暗壁纸写入成功"].waitForExistence(timeout: 20))
         app.alerts.buttons["知道了"].tap()
-        XCTAssertFalse(app.staticTexts["selectedImageSource"].label.contains("雪山映湖"))
+        XCTAssertFalse(app.staticTexts["selectedImageSource"].label.contains("棕影晚霞"))
     }
 
     func testFourFixedTabsAndRestartGuide() throws {
@@ -64,7 +84,7 @@ final class NavigationTests: XCTestCase {
             default:
                 XCTAssertTrue(app.staticTexts["CarPlayW"].exists)
                 XCTAssertTrue(app.staticTexts["鱼头"].exists)
-                XCTAssertTrue(app.staticTexts["v1.0"].exists)
+                XCTAssertTrue(app.staticTexts["v1.1"].exists)
                 XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "其它机型与系统请自行测试")).firstMatch.exists)
                 XCTAssertTrue(app.buttons["项目主页"].exists || app.links["项目主页"].exists)
             }
@@ -114,6 +134,14 @@ final class NavigationTests: XCTestCase {
         XCTAssertTrue(app.staticTexts["32 × 32 pixels"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["Close"].exists)
         try app.screenshot().pngRepresentation.write(to: FileManager.default.temporaryDirectory.appendingPathComponent("CarPlayW-UI-viewer.png"))
+        app.buttons["Close"].tap()
+        app.tabBars.buttons["Wallpaper"].tap()
+        app.buttons["chooseBuiltInWallpaper"].tap()
+        for name in ["Seaside Joy", "Twilight Lighthouse", "Blue Sky Bird", "Palm Sunset"] {
+            app.buttons["nextBuiltInWallpaper"].tap()
+            XCTAssertEqual(app.staticTexts["builtInWallpaperName"].label, name)
+        }
+        XCTAssertTrue(app.buttons["Use this wallpaper"].exists)
         app.buttons["Close"].tap()
     }
 }
