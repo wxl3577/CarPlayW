@@ -17,7 +17,7 @@ final class CPBitmapCodecTests: XCTestCase {
 
     func testBuiltInWallpaperSurvivesATXEncodeAndReadBack() throws {
         let original = try template()
-        let source = try XCTUnwrap(BuiltInWallpaper.alpineReflection.load())
+        let source = try XCTUnwrap(WallpaperTestImage.load())
         let expected = try CPBitmapCodec.expectedImage(image: source, template: original, layout: .fit)
         let encoded = try CPBitmapCodec.encode(image: source, using: original, layout: .fit)
         try CPBitmapCodec.validate(encoded, against: expected)

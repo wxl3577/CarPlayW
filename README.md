@@ -4,7 +4,7 @@
 
 Customize CarPlay wallpapers with TrollStore. One image for both light and dark appearances.
 
-[下载 / Download v1.1](https://github.com/wxl3577/CarPlayW/releases/tag/v1.1)
+[下载 / Download v1.2](https://github.com/wxl3577/CarPlayW/releases/tag/v1.2)
 
 ## 已测试设备 / Tested device
 
@@ -23,7 +23,7 @@ iPhone 12（MGGM3CH/A）· iOS 15.6（19G71）· TrollStore
 
 当前测试设备的图片示例：**2048 × 2048 像素，140 DPI**。请以自己的缓存原图尺寸为准；140 DPI 仅为示例，不是写入限制。
 
-1.1 新增「海边童趣」「暮色灯塔」「晴空小鸟」「棕影晚霞」四张背景，保留原有「雪山映湖」，共五张 2048 × 2048 原图，随应用离线提供。使用「上一张 / 下一张」切换，显示当前序号和图片尺寸。预览并点击「使用这张壁纸」仅选中图片，不会立即写入；也可随时改选相册图片。
+1.2 保留「内置壁纸」入口，改为联网读取配置并按需下载原图。安装包不再内置五张 PNG；原有「雪山映湖」「海边童趣」「暮色灯塔」「晴空小鸟」「棕影晚霞」仍由远程列表提供。打开或刷新壁纸页时读取最新列表，上一张 / 下一张按配置顺序切换。下载完成后点击「使用这张壁纸」仅选中图片，再点击「同时写入亮暗壁纸」才会写入。加载失败可重试；无网络时仍可使用相册图片。原图备份保留在 `docs/wallpaper-originals/`，不打入应用。
 
 请停车后操作。所选系列至少需要已有一份亮或暗缓存，缺失的一份会自动补齐。刷新仅读取手机已有缓存。
 
@@ -44,7 +44,7 @@ Install the IPA from Releases with TrollStore, then:
 
 Image example from the tested device: **2048 × 2048 pixels, 140 DPI**. Match your own cache's pixel dimensions; 140 DPI is an example, not a writing requirement.
 
-Version 1.1 adds **Seaside Joy**, **Twilight Lighthouse**, **Blue Sky Bird** and **Palm Sunset**, keeping **Alpine Reflection** for a total of five original 2048 × 2048 images bundled for offline use. Switch with **Previous / Next**; the current position and image dimensions are shown. Preview it and tap **Use this wallpaper** to select it; this does not write files until you tap Apply. You can switch back to a photo at any time.
+Version 1.2 keeps the **Built-in** entry but fetches its catalog and original images online. The five PNGs are no longer bundled in the app. Opening or refreshing the picker loads the latest catalog; **Previous / Next** follows its order. Wait for the download, then tap **Use this wallpaper** and **Apply to light & dark**. Failed requests can be retried; Photos still works without Internet access. Original backups remain in `docs/wallpaper-originals/`, outside the app target.
 
 Operate only while parked. At least one cached appearance must exist for the selected family; the missing counterpart is created automatically. Refresh reads existing files on the phone.
 
@@ -65,3 +65,13 @@ To clear caches: disconnect → **清除全部缓存图像** (Clear all cached i
 ## 实测效果 / On-device result
 
 ![iPhone 12 · iOS 15.6 · CarPlayW](docs/carplay-test-iphone12-ios15.6.jpg)
+
+## 远程壁纸配置 / Remote catalog
+
+配置地址：<https://480.pp.ua/web_share/carplay/yc/wallpapers.json>
+
+将 [wallpapers.json](remote-wallpapers/wallpapers.json) 上传到 `1.png`–`5.png` 所在目录。JSON 为 UTF-8，`version: 1` 是配置格式版本，应用版本为 1.2。`wallpapers` 数组决定显示顺序和数量；每项包含唯一 `id`、中文 `name`、可选英文 `name_en`、图片 `url`。`url` 可以是相对于配置文件的路径或完整 HTTPS 地址。新增图片时上传文件并添加条目，移除或排序只需编辑数组，无需重新打包 IPA。空数组会显示“暂无在线壁纸”。
+
+每次打开/刷新都会重新请求配置，切换图片会请求原图；只保留当前预览，不提供离线壁纸库。服务端需允许直接 HTTPS GET，不可返回登录页或 HTML 错误页。若使用 CDN，替换文件后请刷新服务端缓存。配置文件上限 1 MiB、最多 500 项；单图上限 32 MiB、最大边长 8192 像素且不超过 3200 万像素。
+
+Upload [wallpapers.json](remote-wallpapers/wallpapers.json) beside the numbered PNGs. The ordered array controls the catalog; each entry has a unique `id`, `name`, optional `name_en`, and a relative path or absolute HTTPS `url`. Add, remove or reorder entries without rebuilding the app. The schema version remains **1**. Catalogs and images require direct HTTPS access; refresh any server/CDN cache after replacing files. The picker downloads on demand and keeps only its current preview.

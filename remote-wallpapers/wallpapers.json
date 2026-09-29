@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "wallpapers": [
+    {
+      "id": "1",
+      "name": "雪山映湖",
+      "name_en": "Alpine Reflection",
+      "url": "1.png"
+    },
+    {
+      "id": "2",
+      "name": "海边童趣",
+      "name_en": "Seaside Joy",
+      "url": "2.png"
+    },
+    {
+      "id": "3",
+      "name": "暮色灯塔",
+      "name_en": "Twilight Lighthouse",
+      "url": "3.png"
+    },
+    {
+      "id": "4",
+      "name": "晴空小鸟",
+      "name_en": "Blue Sky Bird",
+      "url": "4.png"
+    },
+    {
+      "id": "5",
+      "name": "棕影晚霞",
+      "name_en": "Palm Sunset",
+      "url": "5.png"
+    }
+  ]
+}

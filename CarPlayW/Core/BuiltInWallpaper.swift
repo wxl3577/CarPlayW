@@ -1,21 +1,43 @@
-import UIKit
+import Foundation
 
 struct BuiltInWallpaper: Identifiable, Hashable {
+    let id: String
     let name: String
-    let resourceName: String
-    var id: String { resourceName }
+    let englishName: String?
+    let url: URL
 
-    static let alpineReflection = BuiltInWallpaper(name: "雪山映湖", resourceName: "AlpineReflection")
-    static let all: [BuiltInWallpaper] = [
-        alpineReflection,
-        BuiltInWallpaper(name: "海边童趣", resourceName: "SeasideJoy"),
-        BuiltInWallpaper(name: "暮色灯塔", resourceName: "TwilightLighthouse"),
-        BuiltInWallpaper(name: "晴空小鸟", resourceName: "BlueSkyBird"),
-        BuiltInWallpaper(name: "棕影晚霞", resourceName: "PalmSunset")
-    ]
-
-    func load(from bundle: Bundle = .main) -> UIImage? {
-        guard let url = bundle.url(forResource: resourceName, withExtension: "png") else { return nil }
-        return UIImage(contentsOfFile: url.path)
+    func title(in language: AppLanguage) -> String {
+        language == .english ? (englishName ?? name) : name
     }
+}
+
+struct WallpaperCatalog: Decodable {
+    struct Entry: Decodable {
+        let id: String
+        let name: String
+        let name_en: String?
+        let url: String
+    }
+    let version: Int
+    let wallpapers: [Entry]
+
+    func resolved(relativeTo baseURL: URL) throws -> [BuiltInWallpaper] {
+        guard version == 1, wallpapers.count <= 500 else { throw RemoteWallpaperError.invalidCatalog }
+        var identifiers = Set<String>()
+        return try wallpapers.map { entry in
+            let name = entry.name.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !entry.id.isEmpty, !name.isEmpty, !entry.url.isEmpty,
+                  identifiers.insert(entry.id).inserted,
+                  let url = URL(string: entry.url, relativeTo: baseURL)?.absoluteURL,
+                  url.scheme?.lowercased() == "https", url.host != nil,
+                  url.user == nil, url.password == nil else { throw RemoteWallpaperError.invalidCatalog }
+            let english = entry.name_en?.trimmingCharacters(in: .whitespacesAndNewlines)
+            return BuiltInWallpaper(id: entry.id, name: name,
+                                    englishName: english?.isEmpty == false ? english : nil, url: url)
+        }
+    }
+}
+
+enum RemoteWallpaperError: Error {
+    case invalidCatalog, invalidImage, response(Int), tooLarge
 }

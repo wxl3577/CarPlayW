@@ -47,7 +47,7 @@ final class AppModel: ObservableObject {
         return phase == .scanning || showingClearConfirmation
     }
     var canWrite: Bool { phase == .ready && !isBusy && currentLocation != nil }
-    var version: String { Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.1" }
+    var version: String { Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.2" }
     var recommendedDimensions: String { CachedWallpaper.recommendation(for: cachedImages) }
 
     func setSelectedImage(_ image: UIImage, name: String? = nil) {

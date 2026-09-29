@@ -47,6 +47,9 @@ jobs:
       - name: Build unsigned TrollStore IPA
         run: chmod +x scripts/build-ipa.sh && ./scripts/build-ipa.sh
 
+      - name: Verify version and remote-only wallpaper packaging
+        run: python3 scripts/verify-ipa.py build/CarPlayW.ipa
+
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:

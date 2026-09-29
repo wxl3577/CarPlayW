@@ -20,6 +20,14 @@ final class NavigationTests: XCTestCase {
         XCTAssertEqual(XCTWaiter().wait(for: [expectation], timeout: timeout), .completed)
     }
 
+    private func waitForWallpaper(_ app: XCUIApplication) {
+        let ready = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "exists == true AND enabled == true"),
+            object: app.buttons["useBuiltInWallpaper"]
+        )
+        XCTAssertEqual(XCTWaiter().wait(for: [ready], timeout: 10), .completed)
+    }
+
     func testBuiltInPreviewSelectionAndWrite() throws {
         // Only writes the temporary fixture containers, never real CarPlay caches.
         let app = XCUIApplication()
@@ -32,6 +40,7 @@ final class NavigationTests: XCTestCase {
         XCTAssertTrue(app.buttons["choosePhoto"].exists)
         app.buttons["chooseBuiltInWallpaper"].tap()
         XCTAssertTrue(app.staticTexts["雪山映湖"].waitForExistence(timeout: 10))
+        waitForWallpaper(app)
         XCTAssertTrue(app.staticTexts["2048 × 2048 像素"].exists)
         XCTAssertTrue(app.buttons["useBuiltInWallpaper"].isEnabled)
         XCTAssertEqual(app.staticTexts["builtInWallpaperPosition"].label, "1 / 5")
@@ -44,6 +53,7 @@ final class NavigationTests: XCTestCase {
         XCTAssertFalse(app.staticTexts["selectedImageSource"].label.contains("雪山映湖"), "Preview cancellation must not change the selected image")
         waitUntilHittable(app.buttons["chooseBuiltInWallpaper"])
         app.buttons["chooseBuiltInWallpaper"].tap()
+        waitForWallpaper(app)
         app.buttons["useBuiltInWallpaper"].tap()
         XCTAssertTrue(app.staticTexts["selectedImageSource"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["selectedImageSource"].label.contains("雪山映湖"))
@@ -51,9 +61,11 @@ final class NavigationTests: XCTestCase {
             waitUntilHittable(app.buttons["chooseBuiltInWallpaper"])
             app.buttons["chooseBuiltInWallpaper"].tap()
             waitUntilHittable(app.buttons["关闭"])
+            waitForWallpaper(app)
             for _ in 0...offset { app.buttons["nextBuiltInWallpaper"].tap() }
             XCTAssertEqual(app.staticTexts["builtInWallpaperName"].label, title)
             XCTAssertEqual(app.staticTexts["builtInWallpaperPosition"].label, "\(offset + 2) / 5")
+            waitForWallpaper(app)
             XCTAssertTrue(app.staticTexts["2048 × 2048 像素"].exists)
             if offset == 3 {
                 XCTAssertFalse(app.buttons["nextBuiltInWallpaper"].isEnabled)
@@ -61,7 +73,9 @@ final class NavigationTests: XCTestCase {
                 XCTAssertEqual(app.staticTexts["builtInWallpaperName"].label, "晴空小鸟")
                 app.buttons["nextBuiltInWallpaper"].tap()
             }
+            waitForWallpaper(app)
             try captureSettledScreenshot(of: app, named: "CarPlayW-UI-built-in-\(offset + 1).png")
+            waitForWallpaper(app)
             app.buttons["useBuiltInWallpaper"].tap()
             XCTAssertTrue(app.staticTexts["selectedImageSource"].label.contains(title))
         }
@@ -108,7 +122,7 @@ final class NavigationTests: XCTestCase {
             default:
                 XCTAssertTrue(app.staticTexts["CarPlayW"].exists)
                 XCTAssertTrue(app.staticTexts["鱼头"].exists)
-                XCTAssertTrue(app.staticTexts["v1.1"].exists)
+                XCTAssertTrue(app.staticTexts["v1.2"].exists)
                 XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "其它机型与系统请自行测试")).firstMatch.exists)
                 XCTAssertTrue(app.buttons["项目主页"].exists || app.links["项目主页"].exists)
             }
@@ -161,11 +175,58 @@ final class NavigationTests: XCTestCase {
         app.buttons["Close"].tap()
         app.tabBars.buttons["Wallpaper"].tap()
         app.buttons["chooseBuiltInWallpaper"].tap()
+        waitForWallpaper(app)
         for name in ["Seaside Joy", "Twilight Lighthouse", "Blue Sky Bird", "Palm Sunset"] {
             app.buttons["nextBuiltInWallpaper"].tap()
+            waitForWallpaper(app)
             XCTAssertEqual(app.staticTexts["builtInWallpaperName"].label, name)
         }
         XCTAssertTrue(app.buttons["Use this wallpaper"].exists)
         app.buttons["Close"].tap()
+    }
+
+    func testRemoteErrorsRetryAndEmptyList() throws {
+        for scenario in ["catalog-retry", "image-retry", "empty"] {
+            let app = XCUIApplication()
+            app.launchEnvironment["CPW_UI_FIXTURES"] = "1"
+            app.launchEnvironment["CPW_WALLPAPER_SCENARIO"] = scenario
+            app.launch()
+            app.tabBars.buttons.element(boundBy: 3).tap()
+            app.segmentedControls["languageSelector"].buttons["简体中文"].tap()
+            app.tabBars.buttons["壁纸"].tap()
+            app.buttons["chooseBuiltInWallpaper"].tap()
+            if scenario == "empty" {
+                XCTAssertTrue(app.staticTexts["暂无在线壁纸"].waitForExistence(timeout: 10))
+                XCTAssertEqual(app.staticTexts["builtInWallpaperPosition"].label, "0 / 0")
+                XCTAssertFalse(app.buttons["previousBuiltInWallpaper"].isEnabled)
+                XCTAssertFalse(app.buttons["nextBuiltInWallpaper"].isEnabled)
+                XCTAssertFalse(app.buttons["useBuiltInWallpaper"].isEnabled)
+            } else {
+                XCTAssertTrue(app.buttons["retryWallpaper"].waitForExistence(timeout: 10))
+                XCTAssertFalse(app.buttons["useBuiltInWallpaper"].isEnabled)
+                app.buttons["retryWallpaper"].tap()
+                waitForWallpaper(app)
+                XCTAssertEqual(app.staticTexts["builtInWallpaperPosition"].label, "1 / 5")
+            }
+            app.buttons["关闭"].tap()
+            app.terminate()
+        }
+    }
+
+    func testClosingDuringDownloadDoesNotSelectImage() {
+        let app = XCUIApplication()
+        app.launchEnvironment["CPW_UI_FIXTURES"] = "1"
+        app.launchEnvironment["CPW_WALLPAPER_SCENARIO"] = "slow"
+        app.launch()
+        app.tabBars.buttons.element(boundBy: 3).tap()
+        app.segmentedControls["languageSelector"].buttons["简体中文"].tap()
+        app.tabBars.buttons["壁纸"].tap()
+        let before = app.staticTexts["selectedImageSource"].label
+        app.buttons["chooseBuiltInWallpaper"].tap()
+        XCTAssertTrue(app.staticTexts["雪山映湖"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["useBuiltInWallpaper"].isEnabled)
+        app.buttons["关闭"].tap()
+        waitUntilHittable(app.buttons["chooseBuiltInWallpaper"])
+        XCTAssertEqual(app.staticTexts["selectedImageSource"].label, before)
     }
 }
