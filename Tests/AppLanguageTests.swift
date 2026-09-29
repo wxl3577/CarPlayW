@@ -16,7 +16,7 @@ final class AppLanguageTests: XCTestCase {
     }
 
     func testEnglishGuideAndOperationMessagesAreTranslated() {
-        for key in UsageGuide.steps + [UsageGuide.writeSuccessMessage, UsageGuide.imageExample, UsageGuide.testedDeviceMessage, "选择 / 切换系列", "亮暗壁纸写入成功", "清除全部缓存图像"] {
+        for key in UsageGuide.steps + [UsageGuide.writeSuccessMessage, UsageGuide.imageExample, UsageGuide.testedDeviceMessage, BuiltInWallpaper.name, "内置壁纸", "相册图片", "使用这张壁纸", "选择 / 切换系列", "亮暗壁纸写入成功", "清除全部缓存图像"] {
             XCTAssertNotEqual(AppLanguage.english.text(key), key)
         }
         for value in AppLanguage.englishText.values {

@@ -35,7 +35,8 @@ targets:
         CODE_SIGN_ENTITLEMENTS: CarPlayW/Resources/CarPlayW.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "17"
+        CURRENT_PROJECT_VERSION: "18"
+        COMPRESS_PNG_FILES: NO
         CLANG_CXX_LANGUAGE_STANDARD: c++14
         SWIFT_OBJC_BRIDGING_HEADER: CarPlayW/CarPlayW-Bridging-Header.h
     scheme:

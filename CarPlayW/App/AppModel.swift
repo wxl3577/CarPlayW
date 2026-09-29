@@ -18,6 +18,7 @@ final class AppModel: ObservableObject {
 
     @Published var phase: Phase = .unavailable
     @Published var selectedImage: UIImage?
+    @Published var selectedImageName: String?
     @Published var cachedImages: [WallpaperVariant: CachedWallpaper] = [:]
     @Published var notice: Notice?
     @Published var availableLocations: [CarPlayCacheLocation] = []
@@ -49,8 +50,14 @@ final class AppModel: ObservableObject {
     var version: String { Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0" }
     var recommendedDimensions: String { CachedWallpaper.recommendation(for: cachedImages) }
 
-    func setSelectedImage(_ image: UIImage) { selectedImage = image }
-    func clearSelectedImage() { selectedImage = nil }
+    func setSelectedImage(_ image: UIImage, name: String? = nil) {
+        selectedImage = image
+        selectedImageName = name
+    }
+    func clearSelectedImage() {
+        selectedImage = nil
+        selectedImageName = nil
+    }
 
     func selectFamily(_ family: String) {
         guard !isBusy else { return }
@@ -104,7 +111,7 @@ final class AppModel: ObservableObject {
                 case .success(let (location, images)):
                     self.currentLocation = location
                     self.cachedImages = images
-                    self.selectedImage = nil
+                    self.clearSelectedImage()
                     self.phase = .ready
                     self.notice = Notice(title: "亮暗壁纸写入成功", message: UsageGuide.writeSuccessMessage)
                 case .failure(let error):
@@ -155,7 +162,7 @@ final class AppModel: ObservableObject {
             let result = Result { try service.clearCache(plan) }
             DispatchQueue.main.async {
                 self.resetCacheState()
-                self.selectedImage = nil
+                self.clearSelectedImage()
                 switch result {
                 case .success(let count):
                     self.notice = Notice(title: "清理完成", message: AppLanguage.load().format("已清除 %d 个缓存图像，不提供撤销。请连接 CarPlay，打开车机的壁纸设置并重新选择系统壁纸；断开后回到本应用刷新。", count))

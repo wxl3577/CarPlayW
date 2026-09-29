@@ -1,6 +1,37 @@
 import XCTest
 
 final class NavigationTests: XCTestCase {
+    func testBuiltInPreviewSelectionAndWrite() throws {
+        // Only writes the temporary fixture containers, never real CarPlay caches.
+        let app = XCUIApplication()
+        app.launchEnvironment["CPW_UI_FIXTURES"] = "1"
+        app.launch()
+        app.tabBars.buttons.element(boundBy: 3).tap()
+        app.segmentedControls["languageSelector"].buttons["简体中文"].tap()
+        app.tabBars.buttons["壁纸"].tap()
+        XCTAssertTrue(app.staticTexts["找到图像缓存"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.buttons["choosePhoto"].exists)
+        app.buttons["chooseBuiltInWallpaper"].tap()
+        XCTAssertTrue(app.staticTexts["雪山映湖"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["2048 × 2048 像素"].exists)
+        XCTAssertTrue(app.buttons["useBuiltInWallpaper"].isEnabled)
+        XCTAssertEqual(app.scrollViews.count, 0)
+        try app.screenshot().pngRepresentation.write(to: FileManager.default.temporaryDirectory.appendingPathComponent("CarPlayW-UI-built-in.png"))
+        app.buttons["关闭"].tap()
+        XCTAssertFalse(app.staticTexts["selectedImageSource"].label.contains("雪山映湖"), "Preview cancellation must not change the selected image")
+        app.buttons["chooseBuiltInWallpaper"].tap()
+        app.buttons["useBuiltInWallpaper"].tap()
+        XCTAssertTrue(app.staticTexts["selectedImageSource"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["selectedImageSource"].label.contains("雪山映湖"))
+        XCTAssertEqual(app.scrollViews.count, 0)
+        XCTAssertLessThanOrEqual(app.buttons["同时写入亮暗壁纸"].frame.maxY, app.tabBars.firstMatch.frame.minY)
+        try app.screenshot().pngRepresentation.write(to: FileManager.default.temporaryDirectory.appendingPathComponent("CarPlayW-UI-built-in-selected.png"))
+        app.buttons["同时写入亮暗壁纸"].tap()
+        XCTAssertTrue(app.alerts["亮暗壁纸写入成功"].waitForExistence(timeout: 20))
+        app.alerts.buttons["知道了"].tap()
+        XCTAssertFalse(app.staticTexts["selectedImageSource"].label.contains("雪山映湖"))
+    }
+
     func testFourFixedTabsAndRestartGuide() throws {
         let app = XCUIApplication()
         app.launchEnvironment["CPW_UI_FIXTURES"] = "1"

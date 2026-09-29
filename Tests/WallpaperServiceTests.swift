@@ -3,6 +3,21 @@ import UIKit
 @testable import CarPlayW
 
 final class WallpaperServiceTests: XCTestCase {
+    func testBuiltInWallpaperUsesTheSameValidatedPairWriter() throws {
+        let fixture = try fixture()
+        defer { try? FileManager.default.removeItem(at: fixture.root) }
+        let service = WallpaperService(locator: CarPlayCacheLocator(applicationContainerRoot: fixture.root))
+        let image = try XCTUnwrap(BuiltInWallpaper.load())
+        _ = try service.apply(image: image, layout: .fit)
+        let (_, snapshots) = try service.scanCache()
+        for variant in WallpaperVariant.allCases {
+            let saved = try XCTUnwrap(snapshots[variant])
+            XCTAssertEqual(saved.dimensions, "32 × 16", "Keep actual cache dimensions, not the built-in source dimensions")
+            XCTAssertNotEqual(try Data(contentsOf: fixture.location.files[variant]!), fixture.original)
+        }
+        XCTAssertEqual(snapshots[.light]?.image.pngData(), snapshots[.dark]?.image.pngData())
+    }
+
     func testCacheViewerReadsRealBytesAndRefreshesAfterWrite() throws {
         let fixture = try fixture()
         defer { try? FileManager.default.removeItem(at: fixture.root) }

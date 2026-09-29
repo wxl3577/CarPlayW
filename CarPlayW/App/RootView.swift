@@ -6,6 +6,7 @@ struct RootView: View {
     @AppStorage(AppLanguage.storageKey) private var language: AppLanguage = .chinese
     @State private var page: Page = .wallpaper
     @State private var showingPhotoPicker = false
+    @State private var showingBuiltInPicker = false
     @State private var viewingImage: CachedWallpaper?
 
     var body: some View {
@@ -27,6 +28,11 @@ struct RootView: View {
             }
         }
         .fullScreenCover(item: $viewingImage) { CacheImageView(wallpaper: $0) }
+        .fullScreenCover(isPresented: $showingBuiltInPicker) {
+            BuiltInWallpaperView { image in
+                model.setSelectedImage(image, name: BuiltInWallpaper.name)
+            }
+        }
         .alert(item: $model.notice) { notice in
             Alert(title: Text(t(notice.title)), message: Text(t(notice.message)), dismissButton: .default(Text(t("知道了"))))
         }
@@ -80,10 +86,21 @@ struct RootView: View {
                     if model.selectedImage != nil {
                         Button(t("移除"), action: model.clearSelectedImage).font(.caption)
                     }
-                    Button(t(model.selectedImage == nil ? "选择" : "更换")) { showingPhotoPicker = true }
-                        .buttonStyle(.bordered)
                 }
                 .disabled(model.isBusy)
+                HStack(spacing: 12) {
+                    Button { showingPhotoPicker = true } label: {
+                        Label(t("相册图片"), systemImage: "photo.on.rectangle")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .accessibilityIdentifier("choosePhoto")
+                    Button { showingBuiltInPicker = true } label: {
+                        Label(t("内置壁纸"), systemImage: "photo.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .accessibilityIdentifier("chooseBuiltInWallpaper")
+                }
+                .font(.subheadline).buttonStyle(.bordered).disabled(model.isBusy)
                 if let image = model.selectedImage {
                     SquareImage(image: image).frame(width: 152, height: 152)
                         .accessibilityElement(children: .ignore)
@@ -92,8 +109,9 @@ struct RootView: View {
                 }
                 Text(t("完整留边写入，不拉伸、不裁切。"))
                     .font(.footnote).foregroundColor(.secondary)
-                Text(t("显示比例 1:1 · 建议 2048 × 2048 像素"))
+                Text(model.selectedImageName.map { language.format("已选：%@", t($0)) } ?? t("显示比例 1:1 · 建议 2048 × 2048 像素"))
                     .font(.caption).foregroundColor(.secondary)
+                    .accessibilityIdentifier("selectedImageSource")
                 Text(CachedWallpaper.recommendation(for: model.cachedImages, language: language))
                     .font(.caption).foregroundColor(.secondary)
                     .accessibilityIdentifier("recommendedDimensions")
