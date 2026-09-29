@@ -29,8 +29,8 @@ struct RootView: View {
         }
         .fullScreenCover(item: $viewingImage) { CacheImageView(wallpaper: $0) }
         .fullScreenCover(isPresented: $showingBuiltInPicker) {
-            BuiltInWallpaperView { image in
-                model.setSelectedImage(image, name: BuiltInWallpaper.name)
+            BuiltInWallpaperView { image, name in
+                model.setSelectedImage(image, name: name)
             }
         }
         .alert(item: $model.notice) { notice in
