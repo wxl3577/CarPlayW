@@ -7,7 +7,7 @@ final class WallpaperServiceTests: XCTestCase {
         let fixture = try fixture()
         defer { try? FileManager.default.removeItem(at: fixture.root) }
         let service = WallpaperService(locator: CarPlayCacheLocator(applicationContainerRoot: fixture.root))
-        let image = try XCTUnwrap(BuiltInWallpaper.load())
+        let image = try XCTUnwrap(BuiltInWallpaper.alpineReflection.load())
         _ = try service.apply(image: image, layout: .fit)
         let (_, snapshots) = try service.scanCache()
         for variant in WallpaperVariant.allCases {
